@@ -185,11 +185,12 @@
     <div class="history-button">
         <button onclick="toggleHistory()">Xem lịch sử</button>
         <button onclick="toggleChat()">Mở Chatbot</button>
-        <button onclick="window.location.href = 'http://127.0.0.1:5000/admin'">Admin</button> <!-- Nút Đăng Nhập -->
-
+        <button onclick="window.location.href = 'https://web-production-65ce7.up.railway.app/admin'">Admin</button> <!-- Nút Đăng Nhập -->
     </div>
     
     <script>
+        const API_URL = "https://web-production-65ce7.up.railway.app"; // Cập nhật URL API
+
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("send-btn").addEventListener("click", sendMessage);
         });
@@ -211,7 +212,7 @@
 
             chatHistory.innerHTML += `<div class="message waiting-message">Đang xử lý...</div>`;
 
-            fetch("http://127.0.0.1:5000/chat", {
+            fetch(`${API_URL}/chat`, {  // Cập nhật API URL
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
@@ -219,12 +220,8 @@
                 },
                 body: JSON.stringify({ message: userMessage })
             })
-            .then(response => {
-                console.log("Response Status:", response.status); // Kiểm tra lỗi HTTP
-                return response.json();
-            })            
+            .then(response => response.json())           
             .then(data => {
-                console.log("Response Data:", data);
                 document.querySelector(".waiting-message").remove();
                 chatHistory.innerHTML += `<div class="message bot-message">${data.response}</div>`;
                 chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -247,20 +244,17 @@
         }
 
         function loadHistory() {
-            fetch("http://127.0.0.1:5000/history")
+            fetch(`${API_URL}/history`)
             .then(response => response.json())
             .then(data => {
                 const historyContent = document.getElementById("history-content");
                 historyContent.innerHTML = "";
-
                 data.history.forEach(item => {
-                    historyContent.innerHTML += `
-                        <div class="history-entry">
-                            <p><strong>Bạn:</strong> ${item.message}</p>
-                            <p><strong>Bot:</strong> ${item.response}</p>
-                            <hr>
-                        </div>
-                    `;
+                    historyContent.innerHTML += `<div class="history-entry">
+                        <p><strong>Bạn:</strong> ${item.message}</p>
+                        <p><strong>Bot:</strong> ${item.response}</p>
+                        <hr>
+                    </div>`;
                 });
             })
             .catch(error => console.error("Lỗi tải lịch sử:", error));
