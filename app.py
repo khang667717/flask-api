@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 import time
 
 
+
 from flask_cors import CORS  # Import flask_cors
 
-load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "1113"
@@ -618,4 +618,5 @@ def update_laptop(laptop_id):
         return jsonify({"error": f"Lỗi cập nhật dữ liệu: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Lấy port từ biến môi trường, mặc định là 5000
+    app.run(host="0.0.0.0", port=port, debug=False)  # Chạy trên 0.0.0.0 để Railway có thể truy cập
