@@ -4,10 +4,13 @@ import mysql.connector
 import os
 import re
 import pymysql
+from dotenv import load_dotenv
 import time
 
 
 from flask_cors import CORS  # Import flask_cors
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "1113"
@@ -16,18 +19,20 @@ CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:5500"}})
 
 
 # Kết nối MySQL
-try:
-    db = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",  # Đổi mật khẩu nếu cần
-        database="chatbot_laptop_db"
-    )
-    cursor = db.cursor(buffered=True)
-except mysql.connector.Error as err:
-    print(f"Lỗi kết nối MySQL: {err}")
-    exit(1)  # Thoát chương trình nếu kết nối thất bại
+MYSQL_HOST = "yamanote.proxy.rlwy.net"
+MYSQL_USER = "root"
+MYSQL_PASSWORD = "wTejdYhgNEchXKdbBdmAjBFxvOZrVAhy"
+MYSQL_DB = "railway"
+MYSQL_PORT = 21772  # Railway cấp port riêng
 
+db = pymysql.connect(
+    host=MYSQL_HOST,
+    user=MYSQL_USER,
+    password=MYSQL_PASSWORD,
+    database=MYSQL_DB,
+    port=MYSQL_PORT
+)
+cursor = db.cursor()
 
 def handle_upgrade_downgrade(user_message):
     try:
@@ -450,6 +455,15 @@ def get_history():
 def index():
     return render_template('index.html')
 
+@app.route("/test_db")
+def test_db():
+    try:
+        cursor.execute("SELECT DATABASE()")
+        db_name = cursor.fetchone()
+        return jsonify({"message": "Kết nối MySQL thành công!", "database": db_name[0]})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 # Trang Admin
 @app.route('/admin')
 def admin():
