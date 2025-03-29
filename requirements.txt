@@ -4,3 +4,5 @@ pymysql
 werkzeug
 TerraFlow
 flask_cors
+python-dotenv
+
