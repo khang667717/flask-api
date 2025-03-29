@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Laptop</title>
+    <style>
+        /* CSS cơ bản cho giao diện */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .admin-container {
+            width: 80%;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .button-container, h2 {
+            position: relative;
+            z-index: 2;
+            background: #fff;
+            padding: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #add-laptop-form {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            background: #fff;
+            width: 50%;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 2;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        td img {
+            width: 60px;
+            border-radius: 5px;
+        }
+
+        .action-buttons button {
+            margin: 5px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .edit-btn {
+            background-color: #ffc107;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+        }
+
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h2>Quản lý Laptop</h2>
+        
+        <!-- Button container -->
+        <div class="button-container">
+            <button type="button" id="add-laptop-btn">Thêm Laptop</button>
+            <button type="button" id="logout-btn">Đăng xuất</button>
+            <button type="button" id="cancel-btn">Hủy</button>
+        </div>
+
+        <!-- Form Thêm Laptop -->
+        <div id="add-laptop-form" style="display: none; margin-top: 30px;">
+            <h3 id="form-title" >Thêm Laptop</h3>
+            <form id="add-laptop-form-content" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="hidden" id="laptop-id" name="laptop_id">
+                    <label for="name">Tên Laptop</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="brand">Thương hiệu</label>
+                    <input type="text" id="brand" name="brand" required>
+                </div>
+                <div class="form-group">
+                    <label for="price">Giá</label>
+                    <input type="text" id="price" name="price" required>
+                </div>
+                <div class="form-group">
+                    <label for="specifications">Thông số kỹ thuật</label>
+                    <input type="text" id="specifications" name="specifications" required>
+                </div>
+                <div class="form-group">
+                    <img id="current-image" src="" width="100" style="display: none; margin-top: 10px;">
+                    <label for="image_url">Hình ảnh</label>
+                    <input type="file" id="image_url" name="image_url" accept=".png,.jpg,.jpeg" required>
+                </div>
+                <button type="submit" style="background-color: #28a745; color: #fff;">Lưu Laptop</button>
+            </form>
+        </div>
+
+        <!-- Danh sách Laptop -->
+        <div id="laptop-list" style="margin-top: 30px;">
+            <h3>Danh sách Laptop</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tên</th>
+                        <th>Thương hiệu</th>
+                        <th>Giá</th>
+                        <th>Ảnh</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="laptop-list-content">
+                    <!-- Laptop sẽ được hiển thị ở đây -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="overlay"></div>
+
+
+
+    <script>
+        // Đăng xuất
+            document.addEventListener("DOMContentLoaded", loadLaptopList);
+        
+            // Nút mở form thêm laptop
+            document.getElementById('add-laptop-btn').addEventListener('click', function () {
+                document.getElementById('form-title').innerText = "Thêm Laptop";
+                document.getElementById('add-laptop-form-content').reset();
+                document.getElementById('laptop-id').value = ""; // Xóa ID nếu có
+                document.getElementById('current-image').src = ""; // Xóa ảnh cũ
+                document.getElementById('add-laptop-form').style.display = 'block';
+                document.getElementById('cancel-btn').style.display = 'inline-block';
+
+            });
+        
+            // Nút hủy form
+            document.getElementById('cancel-btn').addEventListener('click', closeForm);
+            function closeForm() {
+                document.getElementById('add-laptop-form').style.display = 'none';
+                document.querySelector('.overlay').style.display = 'none';
+            }
+            document.getElementById('logout-btn').addEventListener('click', function () {
+                window.location.href = 'http://127.0.0.1:5000/'; // Đổi '/chatbot' thành URL chatbot của bạn
+            });
+        
+            // Load danh sách laptop
+            // Load danh sách laptop
+            function loadLaptopList() {
+                fetch('/get_laptops')
+                    .then(response => response.json())
+                    .then(data => {
+                        const list = document.getElementById('laptop-list-content'); // Đúng ID
+                        list.innerHTML = "";
+            
+                        data.laptops.forEach(laptop => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${laptop.name}</td>
+                                <td>${laptop.brand}</td>
+                                <td>${parseFloat(laptop.price).toLocaleString('vi-VN')} VND</td>
+                                <td>${laptop.specifications}</td>
+                                <td><img src="${laptop.image_url || '/static/images/default.jpg'}" width="50"></td>
+
+
+                                <td>
+                                    <button onclick="updateLaptop(${laptop.id})">Sửa</button>
+                                    <button onclick="deleteLaptop(${laptop.id})">Xóa</button>
+                                </td>
+                            `;
+                            list.appendChild(row);
+                        });
+                    })
+                    .catch(error => console.error("Lỗi tải danh sách laptop:", error));
+            }
+
+        
+            // Xóa laptop
+            function deleteLaptop(laptopId) {
+                if (confirm('Bạn có chắc chắn muốn xóa laptop này?')) {
+                    fetch(`/delete_laptop/${laptopId}`, { method: 'DELETE' })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message);
+                            loadLaptopList();
+                        })
+                        .catch(error => alert("Lỗi xóa laptop!"));
+                }
+            }
+        
+            // Sửa laptop
+            function updateLaptop(laptopId) {
+                fetch('/get_laptops') // Lấy toàn bộ danh sách laptop
+                    .then(response => response.json())
+                    .then(data => {
+                        const laptop = data.laptops.find(l => l.id === laptopId);
+                        if (laptop) {
+                            document.getElementById('form-title').innerText = "Sửa Laptop";
+                            document.getElementById('add-laptop-form').style.display = 'block';
+                            document.getElementById('laptop-id').value = laptopId;
+                            document.getElementById('name').value = laptop.name;
+                            document.getElementById('brand').value = laptop.brand;
+                            document.getElementById('price').value = laptop.price;
+                            document.getElementById('specifications').value = laptop.specifications;
+                            document.getElementById('current-image').src = laptop.image_url ? laptop.image_url : 'default.jpg';
+                            document.getElementById('current-image').style.display = laptop.image_url ? 'block' : 'none';
+
+
+                            
+                        }
+                    })
+                    .catch(error => error.json().then(err => alert(`Lỗi: ${err.error || "Không xác định"}`)));
+
+            }
+            
+        
+            // Xử lý submit form (Thêm/Sửa laptop)
+            document.getElementById('add-laptop-form-content').addEventListener('submit', function (event) {
+                event.preventDefault();
+        
+                const laptopId = document.getElementById('laptop-id').value;
+                const name = document.getElementById('name').value.trim();
+                const brand = document.getElementById('brand').value.trim();
+                const price = document.getElementById('price').value.trim();
+                const specifications = document.getElementById('specifications').value.trim();
+                const imageUrl = document.getElementById('image_url').files[0];
+        
+                // Kiểm tra dữ liệu hợp lệ
+                if (!name || !brand || !specifications) {
+                    alert("Vui lòng nhập đầy đủ thông tin!");
+                    return;
+                }
+                if (isNaN(price) || price <= 0) {
+                    alert('Giá phải là số hợp lệ!');
+                    return;
+                }
+        
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('brand', brand);
+                formData.append('price', price);
+                formData.append('specifications', specifications);
+                if (imageUrl) {
+                    formData.append('image_url', imageUrl);
+                }
+        
+                const url = laptopId ? `/update_laptop/${laptopId}` : '/add_laptop';
+                const method = laptopId ? 'PUT' : 'POST';
+        
+                fetch(url, {
+                    method: method,
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(`Lỗi: ${data.error}`);
+                    } else {
+                        alert(data.message);
+                        loadLaptopList();
+                        closeForm();
+                    }
+                })
+                .catch(error => {
+                    alert('Có lỗi xảy ra khi lưu laptop!');
+                });
+            });
+        </script>
+        
+</body>
+</html>

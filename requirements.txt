@@ -1,0 +1,6 @@
+Flask
+mysql-connector
+pymysql
+werkzeug
+TerraFlow
+flask_cors

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Laptop Guide</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+        }
+        
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 500px;
+            height: 600px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .chat-box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .chat-history {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+        
+        .chat-history .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+            max-width: 70%;
+        }
+        
+        .chat-history .user-message {
+            background-color: #d1e7fd;
+            align-self: flex-start;
+        }
+        
+        .chat-history .bot-message {
+            background-color: #e0e0e0;
+            align-self: flex-end;
+        }
+        
+        .chat-history .waiting-message {
+            background-color: #f8c776;
+            align-self: center;
+            font-style: italic;
+        }
+        
+        .chat-footer {
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-footer input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+        
+        .chat-footer button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .chat-footer button:hover {
+            background-color: #45a049;
+        }
+        
+        .history-button {
+            margin-top: 20px;
+        }
+        
+        .history-button button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .history-button button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Lịch sử hội thoại */
+        .history-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 400px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-box {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+        }
+
+        .history-content {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .close-history {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .close-history:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container" id="chat-container" style="display: none;">
+        <div class="chat-box">
+            <div id="chat-history" class="chat-history"></div>
+            <div class="chat-footer">
+                <input type="text" id="user-message" placeholder="Hãy nhập câu hỏi về laptop..." autocomplete="off">
+                <button id="send-btn">Gửi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lịch sử hội thoại -->
+    <div class="history-container" id="history-container">
+        <div class="history-box">
+            <h2>Lịch sử hội thoại</h2>
+            <div id="history-content" class="history-content"></div>
+            <button class="close-history" onclick="toggleHistory()">Đóng</button>
+        </div>
+    </div>
+    
+    <div class="history-button">
+        <button onclick="toggleHistory()">Xem lịch sử</button>
+        <button onclick="toggleChat()">Mở Chatbot</button>
+        <button onclick="window.location.href = 'http://127.0.0.1:5000/admin'">Admin</button> <!-- Nút Đăng Nhập -->
+
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("send-btn").addEventListener("click", sendMessage);
+        });
+
+        function toggleChat() {
+            const chatContainer = document.getElementById("chat-container");
+            chatContainer.style.display = (chatContainer.style.display === "none") ? "flex" : "none";
+        }
+
+        function sendMessage() {
+            const userInput = document.getElementById("user-message");
+            const chatHistory = document.getElementById("chat-history");
+            const userMessage = userInput.value.trim();
+
+            if (!userMessage) return;
+
+            chatHistory.innerHTML += `<div class="message user-message">${userMessage}</div>`;
+            userInput.value = "";
+
+            chatHistory.innerHTML += `<div class="message waiting-message">Đang xử lý...</div>`;
+
+            fetch("http://127.0.0.1:5000/chat", {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify({ message: userMessage })
+            })
+            .then(response => {
+                console.log("Response Status:", response.status); // Kiểm tra lỗi HTTP
+                return response.json();
+            })            
+            .then(data => {
+                console.log("Response Data:", data);
+                document.querySelector(".waiting-message").remove();
+                chatHistory.innerHTML += `<div class="message bot-message">${data.response}</div>`;
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            })
+            .catch(error => {
+                console.error("Fetch Error:", error);
+                document.querySelector(".waiting-message").remove();
+                chatHistory.innerHTML += `<div class="message bot-message">Lỗi server! Hãy thử lại sau.</div>`;
+            });
+        }
+
+        function toggleHistory() {
+            const historyContainer = document.getElementById("history-container");
+            if (historyContainer.style.display === "none") {
+                historyContainer.style.display = "flex"; 
+                loadHistory();
+            } else {
+                historyContainer.style.display = "none";
+            }
+        }
+
+        function loadHistory() {
+            fetch("http://127.0.0.1:5000/history")
+            .then(response => response.json())
+            .then(data => {
+                const historyContent = document.getElementById("history-content");
+                historyContent.innerHTML = "";
+
+                data.history.forEach(item => {
+                    historyContent.innerHTML += `
+                        <div class="history-entry">
+                            <p><strong>Bạn:</strong> ${item.message}</p>
+                            <p><strong>Bot:</strong> ${item.response}</p>
+                            <hr>
+                        </div>
+                    `;
+                });
+            })
+            .catch(error => console.error("Lỗi tải lịch sử:", error));
+        }
+    </script>
+</body>
+</html>
