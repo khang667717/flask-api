@@ -325,6 +325,7 @@ def chat():
         data = request.get_json()
         if not data or "message" not in data:
             return jsonify({"error": "Invalid request"}), 400
+        
 
         user_message = data["message"]
 
@@ -618,5 +619,5 @@ def update_laptop(laptop_id):
         return jsonify({"error": f"Lỗi cập nhật dữ liệu: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Lấy port từ biến môi trường, mặc định là 5000
-    app.run(host="0.0.0.0", port=port, debug=False)  # Chạy trên 0.0.0.0 để Railway có thể truy cập
+    port = int(os.environ.get("PORT", 8080))  # Đổi mặc định từ 5000 -> 8080
+    app.run(host="0.0.0.0", port=port, debug=False)
