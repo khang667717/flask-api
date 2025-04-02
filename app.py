@@ -479,6 +479,8 @@ def get_laptops():
     cursor.execute("SELECT * FROM laptops")
     laptops = cursor.fetchall()
 
+    
+    base_url = "https://web-production-65ce7.up.railway.app"
     laptop_list = [
         {
             "id": laptop[0],
@@ -486,7 +488,7 @@ def get_laptops():
             "brand": laptop[2],
             "price": laptop[3],
             "specifications": laptop[4],
-            "image_url": f"http://localhost:5000/static/images/{os.path.basename(laptop[5])}" if laptop[5] else None
+            "image_url": f"{base_url}/static/images/{os.path.basename(laptop[5])}" if laptop[5] else f"{base_url}/static/images/default.jpg"
         }
         for laptop in laptops
     ]
