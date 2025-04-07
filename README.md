@@ -81,3 +81,12 @@ Nâng cấp RAM MacBook Air M2 lên 32GB RAM
 
 Hạ cấp RAM MacBook Air M2 xuống 8GB RAM
 📌 **MacBook Air M2** - Nâng cấp phần cứng: ❎ Bạn có thể **hạ cấp** RAM xuống 8GB RAM và tiết kiệm 200.00$.
+
+
+Thông số : Cách ghi 
+Chip M4, RAM 16GB, SSD 512GB
+Chip M1, RAM 16GB, SSD 512GB
+Ryzen 7, RAM 16GB, RTX 3050
+Chip M3, RAM 16GB, SSD 512GB
+Ryzen 9, RAM 32GB, RTX 4060
+Chip M2, RAM 16GB, SSD 512GB	
