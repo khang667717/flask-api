@@ -1,0 +1,14 @@
+name: Keep Alive
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Mỗi ngày 1 lần vào lúc 00:00 UTC
+  workflow_dispatch:  # Cho phép chạy thủ công từ giao diện GitHub
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Curl your Railway app
+        run: curl https://web-production-65ce7.up.railway.app/
